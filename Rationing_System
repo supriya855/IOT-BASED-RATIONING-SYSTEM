@@ -1,0 +1,156 @@
+  /*
+ *  * hotspot name : project12
+ * hotspot possword : project123456
+ */
+ 
+#define BLYNK_PRINT Serial
+#include <BlynkSimpleEsp8266.h>
+#include <ESP8266WiFi.h>
+ #include<LiquidCrystal.h>
+#include<String.h>
+LiquidCrystal lcd (D0,D1,D2,D3,D4,D5);
+
+// WiFi parameters to be configured
+const char* ssid = "project"; // Hoofdlettergevoelig
+const char* pass = "project12345"; // Hoofdlettergevoelig
+char auth[] = "ttQisfJaLlx-fVQT_3uZG0fZsfW28mj0"; //LYNK AUTHENTICATION----------
+ WidgetLCD lcd1(V0);  //VIRTUAL LCD..
+#define buzzer D6
+#define swith D8
+unsigned int count1 = 0;
+unsigned int flag=0; 
+unsigned int flag1=0; 
+char input[12];
+void lcdstring( int a,int b,String dataa)
+{
+  lcd.setCursor(a,b);
+  lcd.print(dataa);
+}
+ 
+void beep ()
+{
+  digitalWrite(buzzer, HIGH);
+  delay(1000);
+  digitalWrite(buzzer, LOW);
+  delay(100);
+}
+ 
+void setup() {
+  // put your setup code here, to run once:
+  Serial.begin(9600);
+Blynk.begin(auth, ssid, pass);
+  lcd.begin(16, 2);
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print(" RFID BSD Ration ");
+  lcd.setCursor( 0, 1);
+  lcd.print("     S/M ");
+  delay(2500);
+
+  pinMode(buzzer, OUTPUT);
+  pinMode(swith, INPUT);
+ 
+}
+
+void loop()
+{
+  int sw=digitalRead(swith);
+  Serial.print("Swith=");
+  Serial.println(sw);
+// put your main code here, to run repeatedly:
+  Blynk.run();// Run aa Blynk AAP
+    lcd1.clear();
+     lcd.clear();
+  lcd1.print(0, 0,"IOT BASED RATION");
+  lcd1.print(0, 1,"    SYTM");
+   delay(100);
+   lcd1.clear();
+   lcd1.print(0, 1,"PLEASE SHOW CARD");
+R:
+  lcd.setCursor(0, 0);
+  lcd.print("Please show card          ");
+  lcd.setCursor(0, 1);
+  lcd.print("                          ");
+
+  if (Serial.available())
+  {
+    count1 = 0;
+    while (Serial.available() && count1 < 12)         // Read 12 characters and store them in input array
+    {
+      input[count1] = Serial.read();
+      count1++;
+      delay(5);
+    }//WHILE
+    //
+
+    Serial.println(input);                           // Print RFID tag number
+    Serial.print(F("input[10] is ")); Serial.println(input[10]);
+  if (input[10] == '7')
+    {
+      flag++;
+      lcd1.clear();
+      Serial.println("First Person Accept");
+      lcd1.print(0, 0,"First Person Accepted");
+      input[10] = '0';
+      while(1)
+    {
+      if ( input[10] == '6')
+      {
+         flag++;
+        lcd1.clear();
+         lcd.clear();
+          lcd1.print(0, 0,"First Person ");
+          lcd1.print(0, 1,"Taken One Item");
+          delay(800);
+        
+ break;
+goto R;
+}
+ else if ( input[10] == 'F')
+      {
+        flag++;
+         lcd.clear();
+        lcd1.clear();
+         lcd.clear();
+          lcd1.print(0, 0,"First Person ");
+          lcd1.print(0, 1,"Taken Two Items");
+        delay(800);
+ break;
+goto R;
+}
+  else if ( input[10] == '0')
+      {
+        flag++;
+      lcd.clear();
+        lcd1.clear();
+          lcd1.print(0, 0,"First Person ");
+          lcd1.print(0, 1,"Taken Three Items");
+        delay(800);
+ break;
+goto R;
+}  //*************** 1st card END********************************************
+    }///WHILE END
+    } 
+       }
+     ///Serial END
+
+else if(sw==0)
+ {
+  lcd1.clear();
+  Serial.println("Switch pressed");
+  lcd1.print(0, 0, "FIRST PERSON");  
+  lcd1.print(13, 0,flag ); 
+  lcd1.print(0, 1, "  ITEMS TAKEN");  
+  delay(2000);
+  lcd1.clear();
+   lcd1.print(0, 0, "SECOND PERSON");  
+  lcd1.print(13, 0,flag1); 
+  lcd1.print(0, 1, "  ITEMS TAKEN");  
+  delay(2000);
+  flag=0;
+  flag1=0;
+   
+ }
+
+    }// loop
+ 
